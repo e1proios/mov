@@ -1,0 +1,11 @@
+{
+  "name": "movie_api",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.0"
+  }
+}
