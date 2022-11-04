@@ -1,42 +1,50 @@
-exports.movies = [
+export const movies = [
   {
     id: 0,
-    name: 'First Blood'
+    title: 'Dredd'
   },
   {
     id: 1,
-    name: 'Aliens'
+    title: 'Aliens',
+    description: 'Aliens description',
+    director: 'James Cameron',
+    featured: true,
+    genres: ['action', 'sci-fi'],
+    imageURL: 'https://upload.wikimedia.org/wikipedia/en/f/fb/Aliens_poster.jpg',
+    year: 1986
   },
   {
     id: 2,
-    name: 'Natural Born Killers'
+    title: 'Natural Born Killers'
   },
   {
     id: 3,
-    name: 'The Road'
+    title: 'The Road'
   },
   {
     id: 4,
-    name: 'Conan The Barbarian'
+    title: 'Conan The Barbarian'
   },
   {
     id: 5,
-    name: 'True Lies'
+    title: 'True Lies',
+    director: 'James Cameron'
   },
   {
     id: 6,
-    name: 'Full Metal Jacket'
+    title: 'Full Metal Jacket'
   },
   {
     id: 7,
-    name: 'A Clockwork Orange'
+    title: 'A Clockwork Orange'
   },
   {
     id: 8,
-    name: 'Black Hawk Down'
+    title: 'Black Hawk Down'
   },
   {
     id: 9,
-    name: 'No Country for Old Men'
+    title: 'Terminator 2: Judgment Day',
+    director: 'James Cameron'
   }
 ];

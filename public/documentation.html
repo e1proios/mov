@@ -1,21 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
+<style>
+  * {
+    font-family: sans-serif;
+  }
+  table, th, td {
+    border:1px solid black;
+  }
+  table {
+    width: 100%;
+  }
+  .method-name {
+    color: red;
+  }
+</style>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentation</title>
 </head>
+
 <body>
   <header>
     <h1>Movie API Documentation</h1>
   </header>
   <main>
     <div>
-      <h1>My Flix</h1>
-      <p>The web application will provide users with access to information about different movies, directors, and genres. Users will be able to sign up, update their personal information, and create a list of their favorite movies
-      </p>
+      <h2>My Flix</h2>
+
+      <p>API provides users access to information about different movies, directors, and genres.</p>
+
+      <p>A user can sign up, update their personal information, and create a list of their favorite movies</p>
     </div>
-  </main> 
+
+    <div>
+      <h2>Endpoints:</h2>
+
+      <table>
+        <tr>
+          <th>REQUEST</th>
+          <th>URL</th>
+          <th>HTTP METHOD</th>
+          <th>QUERY PARAMS</th>
+          <th>BODY</th>
+          <th>RESPONSE</th>
+        </tr>
+
+        <tr>
+          <td>Get list of movies</td>
+          <td>/movies</td>
+          <td class="method-name">GET</td>
+          <td></td>
+          <td></td>
+          <td>JSON: array of movies</td>
+        </tr>
+
+        <tr>
+          <td>Get movie data by title</td>
+          <td>/movies/:title</td>
+          <td class="method-name">GET</td>
+          <td>movie title: 'Aliens'</td>
+          <td></td>
+          <td>JSON: movie data</td>
+        </tr>
+
+        <tr>
+          <td>Get genre data by name</td>
+          <td>/genres/:name</td>
+          <td class="method-name">GET</td>
+          <td>genre name: 'sci-fi'</td>
+          <td></td>
+          <td>JSON: genre data</td>
+        </tr>
+
+        <tr>
+          <td>Get director data by name</td>
+          <td>/directors/:name</td>
+          <td class="method-name">GET</td>
+          <td>director name: 'James%20Cameron'</td>
+          <td></td>
+          <td>JSON: director data</td>
+        </tr>
+
+        <tr>
+          <td>Register new user</td>
+          <td>/users</td>
+          <td class="method-name">POST</td>
+          <td></td>
+          <td>JSON: { 'name': 'User Name' }</td>
+          <td>JSON: newly created user</td>
+        </tr>
+
+        <tr>
+          <td>Update user data</td>
+          <td>/users/:id</td>
+          <td class="method-name">PUT</td>
+          <td>user id: '0'</td>
+          <td>JSON: { 'name': 'New Name' }</td>
+          <td>JSON: updated user</td>
+        </tr>
+
+        <tr>
+          <td>Add movie to user favorites</td>
+          <td>/users/:id/favorites</td>
+          <td class="method-name">PUT</td>
+          <td>user id: '1'</td>
+          <td>JSON: { 'movieId': '1' }</td>
+          <td>success message: 'Movie' added to user 'Username' favorites'</td>
+        </tr>
+
+        <tr>
+          <td>Remove movie from user favorites</td>
+          <td>/users/:id/favorites</td>
+          <td class="method-name">DELETE</td>
+          <td>user id: '1'</td>
+          <td>JSON: { 'movieId': '1' }</td>
+          <td>success message: 'Movie' removed from user 'Username' favorites'</td>
+        </tr>
+
+        <tr>
+          <td>Close user account</td>
+          <td>/users/:username</td>
+          <td class="method-name">DELETE</td>
+          <td>user id: '1'</td>
+          <td></td>
+          <td>success message: User: 'Username': - account closed</td>
+        </tr>
+      </table>
+    </div>
+  </main>
 </body>
 </html>

@@ -1,7 +1,7 @@
 {
   "name": "movie_api",
   "main": "./server.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "start": "node ./server.js"
   },
