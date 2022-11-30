@@ -1,7 +1,9 @@
-import mongoose, { model, Schema } from 'mongoose';
-import { Movie } from './movie.js';
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
-const userSchema = new Schema({
+const Movie = require('./movie.js')
+
+const userSchema = mongoose.Schema({
   name: { type: String, required: true },
   password: { type: String, required: true },
   email: { type: String, required: true },
@@ -9,4 +11,11 @@ const userSchema = new Schema({
   favoriteMovies: [{ type: mongoose.ObjectId, ref: Movie }]
 });
 
-export const User = model('User', userSchema);
+userSchema.statics.hashPassword = function(pw) {
+  return bcrypt.hashSync(pw, 10);
+};
+userSchema.methods.validatePassword = function(pw) {
+  return bcrypt.compareSync(pw, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);

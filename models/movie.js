@@ -1,6 +1,6 @@
-import { model, Schema } from 'mongoose';
+const mongoose = require('mongoose');
 
-const movieSchema = new Schema({
+const movieSchema = mongoose.Schema({
   title: { type: String, required: true },
   year: { type: Number, min: 1890, required: true },
   description: String,
@@ -17,4 +17,4 @@ const movieSchema = new Schema({
   featured: Boolean
 });
 
-export const Movie = model('Movie', movieSchema);
+module.exports = mongoose.model('Movie', movieSchema);

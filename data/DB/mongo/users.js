@@ -30,6 +30,7 @@ db.users.insertMany([
   {
     name: 'Conan',
     password: 'riddleOfSteel',
+    email: 'conan-the-cimmerian@praise.crom',
     birthday: new Date('1970-01-01'),
     favoriteMovies: [
       ObjectId("636ff6437475cbe95c6989cd")
@@ -43,5 +44,15 @@ db.users.insertMany([
     favoriteMovies: [
       ObjectId("636ff6437475cbe95c6989c9")
     ]
+  },
+  {
+    name: 'Emmanuel Top',
+    password: 'new-black-polished-chrome',
+    email: 'emmanuel.top@techno.de'
+  },
+  {
+    name: 'John Matrix',
+    password: 'get2thechoppa',
+    email: 'john.matrix@commando.us'
   }
 ]);

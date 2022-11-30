@@ -1,37 +1,78 @@
-import express from 'express';
-import fs from 'fs';
-import mongoose from 'mongoose';
-import morgan from 'morgan';
-import passport from 'passport';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const cors = require('cors');
+const express = require('express');
+const expressValidator = require('express-validator');
+const body = expressValidator.body;
+const mongoose = require('mongoose');
+const passport = require('passport');
+const path = require('path');
+const process = require('node:process');
 
-import { Movie } from './models/movie.js';
-import { User } from './models/user.js';
+const Movie = require('./models/movie.js');
+const User = require('./models/user.js');
 
-import { setPassportConfig } from './src/passport.js';
-import { setAuthRoutes } from './src/auth.js';
+const setPassportConfig = require('./src/config/passport.js');
+const setAuthRoutes = require('./src/auth.js');
 
-const DEBUG = true;
+const { ALLOWED_ORIGINS } = require('./src/config/cors.js');
+
+const DEV = false;
+const VERBOSE = true;
 
 const app = express();
-const port = 8080;
+const port =  process.env.PORT || 8080;
 
-setPassportConfig(passport)
+setPassportConfig(passport);
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const jsonParser = express.json();
 
-mongoose.connect('mongodb://localhost:27017/movie_db', { useNewUrlParser: true, useUnifiedTopology: true });
+let mongoAtlasUri;
+
+if (DEV) {
+  mongoAtlasUri = 'mongodb://localhost:27017/movie_db';
+} else {
+  mongoAtlasUri = process.env.mongoURL;
+}
+
+try {
+  // Connect to the MongoDB cluster
+  mongoose.connect(
+    mongoAtlasUri,
+    { useNewUrlParser: true, useUnifiedTopology: true },
+    () => console.log('Mongoose is connected')
+  );
+} catch (e) {
+  log('could not connect', 'error');
+}
+
+// set cors
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      if (!origin) {
+        return cb(null, true);
+      } else {
+        if (ALLOWED_ORIGINS.length) {
+          return ALLOWED_ORIGINS.includes(origin) ?
+            cb(null, true) :
+            cb(new Error(`CORS policy does not allow access from origin ${origin}`), false);
+        } else {
+          cb(null, true);
+        }
+      }
+    }
+  })
+);
 
 // set auth routes
 setAuthRoutes(app);
 
 // static
-app.use(express.static('public', { index: './documentation.html' }));
+app.use(express.static(path.join(__dirname, 'public'), { index: './documentation.html' }));
 
-// middleware: logging
-app.use(morgan('combined', { stream: fs.createWriteStream(path.join(__dirname, 'log.txt'), {flags: 'a'}) }));
+// API hello
+app.get('/hello', (req, res) => {
+  res.status(200).send('API seems to be working');
+});
 
 // GET all movies
 app.get(
@@ -117,17 +158,17 @@ app.get(
   }
 );
 
-// GET user by name
+// GET user by username/e-mail
 app.get(
-  '/users/:name',
+  '/users/:email',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    User.findOne({ name: req.params.name })
+    User.findOne({ email: req.params.email })
     .then(found => {
       if (found) {
         res.status(200).json(found);
       } else {
-        res.status(404).send('no user with such name exists');
+        res.status(404).send(`no user registered under ${req.params.email}`);
       }
     })
     .catch(e => {
@@ -141,14 +182,30 @@ app.get(
 app.post(
   '/users',
   jsonParser,
+  [
+    body('email', 'e-mail address is required').not().isEmpty(),
+    body('email', 'e-mail address is not valid').isEmail(),
+    body('password', 'password is required').not().isEmpty(),
+    body('password', 'minimal password length: 8').isLength({ min: 8 }),
+    body('name', 'username is required').not().isEmpty()
+  ],
   (req, res) => {
-    User.findOne({ name: req.body.name })
+    const errors = expressValidator.validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    User.findOne({ email: req.body.email })
     .then(user => {
       if (user) {
-        return res.status(400).send(`user ${req.body.name} already exists`);
+        return res.status(400).send(`username ${req.body.email} already registered`);
       } else {
         User.create({
-          ...req.body,
+          name: req.body.name,
+          email: req.body.email,
+          birthday: req.body.birthday || null,
+          password: User.hashPassword(req.body.password),
           favoriteMovies: []
         })
         .then(newUser => {
@@ -169,13 +226,34 @@ app.post(
 
 // PUT update user
 app.put(
-  '/users/:name',
+  '/users/:email',
   passport.authenticate('jwt', { session: false }),
   jsonParser,
+  [
+    body('email', 'e-mail is the primary user identifier and can not be changed').not().exists(),
+    body('password', 'minimal password length: 8')
+      .if(body('password').exists())
+      .isLength({ min: 8 }),
+    body('name', 'username can not be empty')
+      .if(body('name').exists())
+      .isLength({ min: 1 })
+  ],
   (req, res) => {
+    const errors = expressValidator.validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    let updatedProps = { ...req.body};
+
+    if (updatedProps.password) {
+      updatedProps.password = User.hashPassword(updatedProps.password);
+    }
+
     User.findOneAndUpdate(
-      { name: req.params.name },
-      { $set: { ...req.body }},
+      { email: req.params.email },
+      { $set: updatedProps },
       { new: true }
     )
     .then(updatedUser => {
@@ -190,12 +268,12 @@ app.put(
 
 // PUT movie to user favorites
 app.put(
-  '/users/:name/favorites',
+  '/users/:email/favorites',
   passport.authenticate('jwt', { session: false }),
   jsonParser,
   (req, res) => {
     User.findOneAndUpdate(
-      { name: req.params.name },
+      { email: req.params.email },
       { $addToSet: { favoriteMovies: mongoose.Types.ObjectId(req.body.movieId) }},
       { new: true }
     )
@@ -211,12 +289,12 @@ app.put(
 
 // DELETE movie from user favorites
 app.delete(
-  '/users/:name/favorites',
+  '/users/:email/favorites',
   passport.authenticate('jwt', { session: false }),
   jsonParser,
   (req, res) => {
     User.findOneAndUpdate(
-      { name: req.params.name },
+      { email: req.params.email },
       { $pull: { favoriteMovies: mongoose.Types.ObjectId(req.body.movieId) }},
       { new: true }
     )
@@ -232,17 +310,17 @@ app.delete(
 
 // DELETE user
 app.delete(
-  '/users/:name',
+  '/users/:email',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     User.findOneAndDelete(
-      { name: req.params.name },
+      { email: req.params.email },
     )
     .then(deletedUser => {
       if (!deletedUser) {
-        res.status(400).send('no user with such name exists');
+        res.status(400).send(`no user registered under ${req.params.email}`);
       } else {
-        res.status(200).send(`user: ${req.params.name} was deleted`);
+        res.status(200).send(`user: ${deletedUser.name} was deleted`);
       }
     })
     .catch(e => {
@@ -252,12 +330,12 @@ app.delete(
   }
 );
 
-app.listen(port, () => {
-  log(`Server running at http://localhost:${port}/`);
+app.listen(port, '0.0.0.0', () => {
+  log(`Listening on port ${port}`);
 });
 
 function log(msg, severity) {
-  if (DEBUG) {
+  if (VERBOSE) {
     switch (severity) {
       case 'error':
         console.error(msg);
@@ -271,3 +349,5 @@ function log(msg, severity) {
     }
   }
 }
+
+module.exports = app;

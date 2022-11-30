@@ -65,6 +65,50 @@
           <th>RESPONSE</th>
         </tr>
 
+<!----------------------------------------------------------------------------->
+
+        <tr>
+          <td>login</td>
+
+          <td>
+            <span class="endpoint">/login</span>
+          </td>
+
+          <td class="method-name">POST</td>
+
+          <td></td>
+
+          <td>JSON:
+            <code>
+<pre>{
+  email: string,
+  password: string
+}</pre>
+            </code>
+          </td>
+
+          <td>JSON: user data & JWT auth token
+            <code>
+<pre>{
+  "user": {
+      "_id": "638635f93107afc10e144e60",
+      "name": "Ellen Ripley",
+      "password": "$2b$10$g...",
+      "email": "ellen.ripley@weyland-yutani.corp",
+      "birthday": null,
+      "favoriteMovies": [
+        "636ff6437475cbe95c6989ca"
+      ],
+      "__v": 0
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6Ik..."
+}</pre>
+            </code>
+          </td>
+        </tr>
+
+<!----------------------------------------------------------------------------->
+
         <tr>
           <td>get all movies</td>
 
@@ -80,6 +124,8 @@
 
           <td>JSON: array of movies</td>
         </tr>
+
+<!----------------------------------------------------------------------------->
 
         <tr>
           <td>get movie by title</td>
@@ -116,6 +162,8 @@
           </td>
         </tr>
 
+<!----------------------------------------------------------------------------->
+
         <tr>
           <td>get genre by name</td>
 
@@ -138,6 +186,8 @@
             </code>
           </td>
         </tr>
+
+<!----------------------------------------------------------------------------->
 
         <tr>
           <td>get director by name</td>
@@ -163,6 +213,8 @@
           </td>
         </tr>
 
+<!----------------------------------------------------------------------------->
+
         <tr>
           <td>get all users</td>
 
@@ -179,33 +231,37 @@
           <td>JSON: array of users</td>
         </tr>
 
+<!----------------------------------------------------------------------------->
+
         <tr>
-          <td>get user by name</td>
+          <td>get user by username (e-mail)</td>
 
           <td>
-            <span class="endpoint">/users/:name</span>
+            <span class="endpoint">/users/:email</span>
           </td>
 
           <td class="method-name">GET</td>
 
-          <td>name: 'Ellen%20Ripley'</td>
+          <td>email: 'ellen.ripley@weyland-yutani.corp'</td>
 
           <td></td>
 
           <td>JSON: user data
             <code>
 <pre>{
-  "_id": "63750ccf2251c4e942ff339d",
-  "name": "John Matrix",
-  "password": "get2thechoppa",
-  "email": "john.matrix@commando.us",
+  "_id": "638635f93107afc10e144e60",
+  "name": "Ellen Ripley",
+  "password": "$2b$10$glLPwaQj8wAUDKihDnb7z...",
+  "email": "ellen.ripley@weyland-yutani.corp",
   "favoriteMovies": [
     "636ff6437475cbe95c6989d2"
-  ]
+  ],
 }</pre>
             </code>
           </td>
         </tr>
+
+<!----------------------------------------------------------------------------->
 
         <tr>
           <td>register new user</td>
@@ -232,23 +288,24 @@
           <td>JSON: created user</td>
         </tr>
 
+<!----------------------------------------------------------------------------->
+
         <tr>
-          <td>update user data</td>
+          <td>update user</td>
 
           <td>
-            <span class="endpoint">/users/:name</span>
+            <span class="endpoint">/users/:email</span>
           </td>
 
           <td class="method-name">PUT</td>
 
-          <td>user name: 'Ellen%20Ripley'</td>
+          <td>email: 'ellen.ripley@weyland-yutani.corp'</td>
 
           <td>JSON:
             <code>
 <pre>{
   name?: string,
   password?: string,
-  email?: string,
   birthday?: Date
 }</pre>
             </code>
@@ -257,16 +314,18 @@
           <td>JSON: updated user</td>
         </tr>
 
+<!----------------------------------------------------------------------------->
+
         <tr>
           <td>add movie to user favorites</td>
 
           <td>
-            <span class="endpoint">/users/:name/favorites</span>
+            <span class="endpoint">/users/:email/favorites</span>
           </td>
 
           <td class="method-name">PUT</td>
 
-          <td>user name: 'Ellen%20Ripley'</td>
+          <td>email: 'ellen.ripley@weyland-yutani.corp'</td>
 
           <td>JSON:
             <code>
@@ -278,17 +337,19 @@
 
           <td>JSON: updated user</td>
         </tr>
+
+<!----------------------------------------------------------------------------->
 
         <tr>
           <td>remove movie from user favorites</td>
 
           <td>
-            <span class="endpoint">/users/:name/favorites</span>
+            <span class="endpoint">/users/:email/favorites</span>
           </td>
 
           <td class="method-name">DELETE</td>
 
-          <td>user name: 'Ellen%20Ripley'</td>
+          <td>email: 'ellen.ripley@weyland-yutani.corp'</td>
 
           <td>JSON:
             <code>
@@ -301,16 +362,18 @@
           <td>JSON: updated user</td>
         </tr>
 
+<!----------------------------------------------------------------------------->
+
         <tr>
           <td>close user account</td>
 
           <td>
-            <span class="endpoint">/users/:name</span>
+            <span class="endpoint">/users/:email</span>
           </td>
 
           <td class="method-name">DELETE</td>
 
-          <td>user name: 'Ellen%20Ripley'</td>
+          <td>email: 'ellen.ripley@weyland-yutani.corp'</td>
 
           <td></td>
 

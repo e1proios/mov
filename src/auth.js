@@ -1,9 +1,10 @@
-import express from 'express';
-import jsonwebtoken from 'jsonwebtoken';
-import passport from 'passport';
+const express = require('express');
+const jsonwebtoken = require ('jsonwebtoken');
+const passport = require('passport');
+
+const jwtSecret = 'your_jwt_secret';
 
 const jsonParser = express.json();
-const jwtSecret = 'your_jwt_secret';
 
 function generateJWTToken(user) {
   return jsonwebtoken.sign(user, jwtSecret, {
@@ -13,13 +14,13 @@ function generateJWTToken(user) {
   });
 }
 
-export function setAuthRoutes(router) {
+module.exports = function setAuthRoutes(router) {
   router.post('/login', jsonParser, (req, res) => {
     passport.authenticate('local', { session: false }, (error, user) => {
       if (error || !user) {
         return res.status(400).json({
           message: 'login failed',
-          user: user
+          error: error
         });
       } else {
         req.login(user, { session: false }, (error) => {
